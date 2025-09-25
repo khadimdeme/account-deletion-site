@@ -12,22 +12,21 @@
 </head>
 <body>
   <h1>Demander la suppression de votre compte</h1>
-
   <p>Entrez l’adresse e-mail utilisée dans l’application. Votre compte sera désactivé tout de suite puis
   supprimé définitivement sous 30 jours. Vous pouvez annuler en vous reconnectant avant l’échéance.</p>
 
   <form id="f">
     <label>E-mail</label><br/>
-    <input type="email" name="email" required style="width:100%;padding:10px" /><br/><br/>
+    <input type="email" name="email" required style="width:100%;padding:10px"><br><br>
     <label>Raison (facultatif)</label><br/>
-    <textarea name="reason" rows="4" style="width:100%;padding:10px"></textarea><br/><br/>
+    <textarea name="reason" rows="4" style="width:100%;padding:10px"></textarea><br><br>
     <button type="submit" style="padding:10px 16px">Envoyer la demande</button>
   </form>
 
   <p id="m" aria-live="polite"></p>
 
-  <hr/>
-  <p>Besoin d’aide ? Écrivez-nous : <a href="mailto:contact@aloregion.com">contact@aloregion.com</a><br/>
+  <hr>
+  <p>Besoin d’aide ? <a href="mailto:contact@aloregion.com">contact@aloregion.com</a><br>
   Lien Play Store : <a href="https://play.google.com/store/apps/details?id=APP_ID_A_METTRE_PLUS_TARD" target="_blank" rel="noopener">Alo Région (bientôt)</a></p>
 
   <script>
@@ -36,6 +35,7 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       msg.textContent = 'Envoi en cours…';
+      msg.className = '';
       const data = Object.fromEntries(new FormData(form).entries());
       try {
         const r = await fetch('/api/request-deletion', {
@@ -47,7 +47,7 @@
         msg.className = r.ok ? 'ok' : 'err';
         msg.textContent = t || (r.ok ? 'OK' : 'Erreur');
         if (r.ok) form.reset();
-      } catch (err) {
+      } catch {
         msg.className = 'err';
         msg.textContent = 'Erreur réseau.';
       }
