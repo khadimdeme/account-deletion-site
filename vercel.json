@@ -7,10 +7,9 @@
     { "source": "/politique-de-confidentialite", "destination": "/privacy", "permanent": true },
     { "source": "/conditions-d-utilisation", "destination": "/terms", "permanent": true },
 
-    // si ton formulaire de suppression est à la racine (index.html)
+  
     { "source": "/delete", "destination": "/", "permanent": true }
 
-    // si au contraire tu as un fichier delete.html, supprime la ligne ci-dessus :
-    // cleanUrls te donnera /delete automatiquement
+    
   ]
 }
