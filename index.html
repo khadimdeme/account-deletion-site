@@ -2,56 +2,74 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <title>Suppression de compte - Alo Région</title>
+  <title>Demande de suppression — Alo Region</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body{font-family:system-ui,Arial;padding:20px;max-width:720px;margin:auto;line-height:1.5}
+    :root{--fg:#111;--muted:#555;--bg:#fff;--card:#f7f8fa;--link:#0b57d0}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,Segoe UI,Arial}
+    main{max-width:900px;margin:0 auto;padding:24px 16px}
+    h1{margin:0 0 8px}
+    p,li{margin:8px 0}
+    header{background:var(--card);border-bottom:1px solid #e5e7eb}
+    header main{padding:24px 16px}
+    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
     input,textarea,button{font:inherit}
     .ok{color:#137333}.err{color:#b3261e}
+    footer{margin:24px auto;border-top:1px solid #eee;padding-top:12px;font-size:14px;max-width:900px}
   </style>
 </head>
 <body>
-  <h1>Demander la suppression de votre compte</h1>
-  <p>Entrez l’adresse e-mail utilisée dans l’application. Votre compte sera désactivé tout de suite puis
-  supprimé définitivement sous 30 jours. Vous pouvez annuler en vous reconnectant avant l’échéance.</p>
+<header>
+  <main>
+    <h1>Demander la suppression de votre compte</h1>
+    <p>Entrez l’adresse e-mail utilisée dans l’application. Votre compte sera désactivé tout de suite puis supprimé définitivement sous 30 jours. Vous pouvez annuler en vous reconnectant avant l’échéance.</p>
+  </main>
+</header>
 
-  <form id="f">
-    <label>E-mail</label><br/>
-    <input type="email" name="email" required style="width:100%;padding:10px"><br><br>
-    <label>Raison (facultatif)</label><br/>
-    <textarea name="reason" rows="4" style="width:100%;padding:10px"></textarea><br><br>
+<main>
+  <form id="f" aria-describedby="desc">
+    <label for="email">E-mail</label><br/>
+    <input id="email" type="email" name="email" required style="width:100%;padding:10px" /><br/><br/>
+
+    <label for="reason">Raison (facultatif)</label><br/>
+    <textarea id="reason" name="reason" rows="4" style="width:100%;padding:10px"></textarea><br/><br/>
+
     <button type="submit" style="padding:10px 16px">Envoyer la demande</button>
   </form>
 
   <p id="m" aria-live="polite"></p>
 
-  <hr>
-  <p>Besoin d’aide ? <a href="mailto:contact@aloregion.com">contact@aloregion.com</a><br>
-  Lien Play Store : <a href="https://play.google.com/store/apps/details?id=APP_ID_A_METTRE_PLUS_TARD" target="_blank" rel="noopener">Alo Région (bientôt)</a></p>
+  <hr/>
+  <p>Besoin d’aide ? Écrivez-nous : <a href="mailto:khadimalmoustapha01@gmail.com">contact@aloregion.com</a></p>
+</main>
 
-  <script>
-    const form = document.getElementById('f');
-    const msg  = document.getElementById('m');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      msg.textContent = 'Envoi en cours…';
-      msg.className = '';
-      const data = Object.fromEntries(new FormData(form).entries());
-      try {
-        const r = await fetch('/api/request-deletion', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify(data)
-        });
-        const t = await r.text();
-        msg.className = r.ok ? 'ok' : 'err';
-        msg.textContent = t || (r.ok ? 'OK' : 'Erreur');
-        if (r.ok) form.reset();
-      } catch {
-        msg.className = 'err';
-        msg.textContent = 'Erreur réseau.';
-      }
-    });
-  </script>
+<footer>
+  <a href="/privacy">Politique de confidentialité</a> ·
+  <a href="/terms">Conditions d’utilisation</a>
+</footer>
+
+<script>
+  const form = document.getElementById('f');
+  const msg  = document.getElementById('m');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.textContent = 'Envoi en cours…';
+    const data = Object.fromEntries(new FormData(form).entries());
+    try {
+      const r = await fetch('/api/request-deletion', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+      const t = await r.text();
+      msg.className = r.ok ? 'ok' : 'err';
+      msg.textContent = t || (r.ok ? 'Demande enregistrée.' : 'Erreur');
+      if (r.ok) form.reset();
+    } catch (err) {
+      msg.className = 'err';
+      msg.textContent = 'Erreur réseau.';
+    }
+  });
+</script>
 </body>
 </html>
