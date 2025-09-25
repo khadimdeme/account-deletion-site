@@ -3,3 +3,9 @@
     { "path": "/api/cron", "schedule": "0 3 * * *" }
   ]
 }
+{
+  "cleanUrls": true,
+  "crons": [
+    { "path": "/api/cron", "schedule": "0 3 * * *" }
+  ]
+}
