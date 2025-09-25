@@ -13,38 +13,34 @@ export default async function handler(req, res) {
   }
   const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-  // Body JSON
   let body = req.body;
   if (typeof body === 'string') {
     try { body = JSON.parse(body); } catch { body = {}; }
   }
-
-  const emailRaw = (body.email || '').toString().trim().toLowerCase();
-  const reason   = (body.reason || '').toString();
-  if (!emailRaw) { res.status(400).send('Email requis'); return; }
+  const email = (body.email || '').toString().trim().toLowerCase();
+  const reason = (body.reason || '').toString();
+  if (!email) { res.status(400).send('Email requis'); return; }
 
   // 1) Trouver l’utilisateur
   let userId = null;
   const { data: cli, error: cliErr } = await sb
-    .from('clients')
-    .select('user_id,email')
-    .eq('email', emailRaw)
-    .maybeSingle();
+    .from('clients').select('user_id,email').eq('email', email).maybeSingle();
   if (cliErr) { res.status(500).send(cliErr.message); return; }
   if (cli?.user_id) userId = cli.user_id;
-
   if (!userId) {
-    const { data: byEmail, error: adminErr } = await sb.auth.admin.getUserByEmail(emailRaw);
-    if (adminErr || !byEmail?.user?.id) { res.status(404).send('Utilisateur introuvable'); return; }
-    userId = byEmail.user.id;
+    const { data: byEmail, error: adminErr } = await sb.auth.admin.getUserByEmail(email);
+    if (adminErr) { res.status(404).send('Utilisateur introuvable'); return; }
+    userId = byEmail?.user?.id ?? null;
   }
+  if (!userId) { res.status(404).send('Utilisateur introuvable'); return; }
 
   // 2) Enregistrer la demande (J+30)
-  const deleteAfter = new Date(Date.now() + 30*24*60*60*1000).toISOString();
+  const now = new Date();
+  const deleteAfter = new Date(now.getTime() + 30*24*60*60*1000).toISOString();
   const { error: upErr } = await sb.from('account_deletion_requests').upsert({
     user_id: userId,
     reason,
-    requested_at: new Date().toISOString(),
+    requested_at: now.toISOString(),
     delete_after: deleteAfter,
     status: 'pending',
     processed_at: null
